@@ -4,6 +4,8 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count
 from attendance.models import Attendance
 from rest_framework.views import APIView
+from django.db.models import Q
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AttendanceStatsView(APIView):

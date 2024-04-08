@@ -58,7 +58,8 @@ class CourseStudent(APIView):
             student = registration.student
             students_data.append({
                 'name': student.name,
-                'roll_no': student.id
+                'roll_no': student.id,
+                'status':0
             })
 
 
