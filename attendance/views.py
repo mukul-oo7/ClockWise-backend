@@ -1,39 +1,34 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Attendance, Student, CourseRegistration
-from datetime import date as currentDate
+# Example usage
+from datetime import date
+from account.models import Student
+from .models import Attendance
 
-class TakeAttendance(APIView):
-    def post(self, request):
-        # Extract data from the request
-        student_id = request.data.get('student_id')
-        status = request.data.get('status')
-        course_code = request.data.get('course_code')
-
-        # Get the current date
-        current_date = currentDate.today()
-
-        # Retrieve the student and course objects
-        try:
-            student = Student.objects.get(id=student_id)
-            course_registration = CourseRegistration.objects.get(course_code=course_code, student=student)
-        except Student.DoesNotExist:
-            return Response({'error': 'Student does not exist'}, status=status.HTTP_404_NOT_FOUND)
-        except CourseRegistration.DoesNotExist:
-            return Response({'error': 'Student is not registered for this course'}, status=status.HTTP_404_NOT_FOUND)
-
-        # Validate the status
-        if status not in [0, 1]:
-            return Response({'error': 'Invalid status. Status must be 0 (Absent) or 1 (Present)'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Create the attendance record
+def create_attendance(student_instance, date, status, course_name):
+    try:
+        # Create attendance record
         attendance = Attendance.objects.create(
-            date=current_date,
-            student=student,
+            student=student_instance,
+            date=date,
             status=status,
-            course_code=course_registration.course_code  # Assuming course_code is a field in CourseRegistration model
+            course_name=course_name
         )
+        return attendance
+    except Exception as e:
+        # Handle exception (e.g., IntegrityError, ValidationError)
+        print(f"Error creating attendance record: {e}")
+        return None
 
-        return Response({'message': 'Attendance recorded successfully'}, status=status.HTTP_201_CREATED)
+class Take_attandance(APIView):
+    def post:
+        # Assuming student_instance is an instance of the Student model
+        student_instance = Student.objects.get(id=1)
+        date = date.today()  # or any other date
+        status = 1  # 1 for Present, 0 for Absent
+        course_name = "CS101"
+
+        # Create attendance record
+        attendance_record = create_attendance(student_instance, date, status, course_name)
+        if attendance_record:
+            print("Attendance record created successfully")
+        else:
+            print("Failed to create attendance record")

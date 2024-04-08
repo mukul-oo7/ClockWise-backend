@@ -44,6 +44,7 @@ class LoginView(APIView):
         if user is None:
             response.status_code=400
             response.data = {
+                "allowed":"no",
                 "message": "Email not found"
             }
             return response
@@ -51,6 +52,7 @@ class LoginView(APIView):
         if not user.check_password(password):
             response.status_code=400
             response.data = {
+                "allowed":"no",
                 "message": "Incorrect Password"
             }
             return response
@@ -70,6 +72,7 @@ class LoginView(APIView):
 
         response.status_code = 200
         response.data = {
+            "allowed":"yes",
             "user_id": user.id,
         }
 
