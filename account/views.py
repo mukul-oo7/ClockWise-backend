@@ -59,6 +59,7 @@ def calculate_attendance_stats(student_id):
 class RegisterView(APIView):
     def post(self, request):
         if request.data['cat'] == 'Student' :
+            print(request.data)
             serializer = StudentSerializer(data = request.data)
             if serializer.is_valid(raise_exception=True):
                 instance = serializer.save()

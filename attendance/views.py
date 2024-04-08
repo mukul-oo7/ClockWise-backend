@@ -6,7 +6,44 @@ from rest_framework.views import APIView
 from account.models import Student, Faculty, CourseRegistration
 from django.http import JsonResponse
 from rest_framework.response import Response
-from datetime import date
+from datetime import date, datetime
+
+from rest_framework.decorators import api_view
+from django.db.models import Q
+
+
+# @api_view(['POST'])
+class LeaveApproved(APIView):
+    def post(self, request):
+        student_id = request.data.get('student_id')
+        start_date_str = request.data.get('start_date')
+        end_date_str = request.data.get('end_date')
+
+        if student_id is None or start_date_str is None or end_date_str is None:
+            return Response({'error': 'student_id, start_date, and end_date are required'}, status=400)
+
+        try:
+            student_id = int(student_id)
+        except ValueError:
+            return Response({'error': 'student_id must be an integer'}, status=400)
+
+        try:
+            start_date = datetime.strptime(start_date_str, '%d-%m-%Y').date()
+            end_date = datetime.strptime(end_date_str, '%d-%m-%Y').date()
+        except ValueError:
+            return Response({'error': 'start_date and end_date must be in dd-mm-yyyy format'}, status=400)
+
+        attendance_records = Attendance.objects.filter(
+            student_id=student_id,
+            date__range=[start_date, end_date]
+        )
+
+        for record in attendance_records:
+            record.status = 1
+            record.save()
+
+        return Response({'message': 'Attendance marked as Present for the specified date range'}, status=200)
+
 
 
 def process_attendance_data(data):
@@ -64,6 +101,7 @@ class CourseStudent(APIView):
             })
 
 
-
         # Return JsonResponse with student data
         return JsonResponse({'students': students_data})
+    
+

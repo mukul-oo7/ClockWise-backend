@@ -1,7 +1,6 @@
 from django.db import models
 from account.models import Student, CourseRegistration
 
-
 # Create your models here.
 class Attendance(models.Model):
     date = models.DateField()
