@@ -48,6 +48,7 @@ class HandleAttendance(APIView):
 class CourseStudent(APIView):
     def post(self, request):
         course_name = request.data.get('course_name')
+        print(request.data)
 
         # Query CourseRegistration objects for the given course name
         registrations = CourseRegistration.objects.filter(course_name=course_name)

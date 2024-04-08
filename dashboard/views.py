@@ -1,8 +1,9 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, response
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.db.models import Count
 from attendance.models import Attendance
+from account.models import Student
 from rest_framework.views import APIView
 from django.db.models import Q
 
@@ -11,7 +12,8 @@ from django.db.models import Q
 class AttendanceStatsView(APIView):
     def post(self, request):
         # Get student_id from request data
-        student_id = request.data.get('student_id')
+        email_id = request.data.get('email_id')
+        student_id = Student.objects.filter(email_id=email_id)[0].id
 
         if not student_id:
             return JsonResponse({'error': 'Student ID not provided'}, status=400)
@@ -19,8 +21,13 @@ class AttendanceStatsView(APIView):
         # Calculate attendance stats for the given student
         stats = self.calculate_attendance_stats(student_id)
 
+        Response = response()
+        Response.data = {
+            'course':stats
+        }
+
         # Return the data as JSON response
-        return JsonResponse({'course': stats})
+        return Response
 
     def calculate_attendance_stats(self, student_id):
         # Retrieve attendance data for the given student
