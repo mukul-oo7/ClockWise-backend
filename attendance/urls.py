@@ -1,5 +1,6 @@
 from django.urls import path, include
+from .views import CourseStudent
 
 urlpatterns = [
-    # path('login/', LoginView.as_view(), name="login"),
+    path('getStudent/', CourseStudent.as_view(), name="getStudent"),
 ]
