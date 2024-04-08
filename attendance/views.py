@@ -6,39 +6,42 @@ from rest_framework.views import APIView
 from account.models import Student, Faculty, CourseRegistration
 from django.http import JsonResponse
 from rest_framework.response import Response
+from datetime import date
 
 
+def process_attendance_data(data):
+    course_name = data.get('course_name')
 
+    students_data = data.get('students', [])
+    for student_data in students_data:
+        student_roll_no = student_data.get('roll_no')
+        status = student_data.get('status')
 
-# def create_attendance(student_instance, date, status, course_name):
-#     try:
-#         # Create attendance record
-#         attendance = Attendance.objects.create(
-#             student=student_instance,
-#             date=date,
-#             status=status,
-#             course_name=course_name
-#         )
-#         return attendance
-#     except Exception as e:
-#         # Handle exception (e.g., IntegrityError, ValidationError)
-#         print(f"Error creating attendance record: {e}")
-#         return None
+        # Check if roll_no and status are provided
+        if student_roll_no is None or status is None:
+            continue
 
-# class Take_attandance(APIView):
-#     def post(self, request):
-        # Assuming student_instance is an instance of the Student model
-        # student_instance = Student.objects.get(id=1)
-        # date = date.today()  # or any other date
-        # status = 1  # 1 for Present, 0 for Absent
-        # course_name = "CS101"
+        try:
+            student = Student.objects.get(id=student_roll_no)
+            # Create Attendance object
+            Attendance.objects.create(
+                date=date.today(),
+                student=student,
+                status=status,
+                course_name=course_name
+            )
+        except Student.DoesNotExist:
+            print(f"Student with roll_no {student_roll_no} does not exist.")
 
-        # Create attendance record
-        # attendance_record = create_attendance(student_instance, date, status, course_name)
-        # if attendance_record:
-        #     print("Attendance record created successfully")
-        # else:
-        #     print("Failed to create attendance record")
+class HandleAttendance(APIView):
+    def post(self, request):
+        data = request.data
+        
+        # Process the attendance data
+        process_attendance_data(data)
+
+        return JsonResponse({'message': 'Attendance data processed successfully'})
+
 
 
 
