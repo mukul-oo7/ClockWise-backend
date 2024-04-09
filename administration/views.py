@@ -8,33 +8,6 @@ from datetime import datetime
 from rest_framework import status
 from .models import AppliedLeave
 
-# class AppliedLeaveListView(APIView):
-#     def get(self, request, format=None):
-        # Fetch all applied leaves
-        # applied_leaves = AppliedLeave.objects.all()
-
-        # # Create a list to store formatted data
-        # leave_list = []
-
-        # # Iterate through each applied leave
-        # for leave in applied_leaves:
-        #     # Get the student associated with the leave
-        #     student = Student.objects.get(id=leave.student_id)
-
-        #     # Format the data
-        #     leave_data = {
-        #         'student_id': student.id,
-        #         'student_name': student.name,
-        #         'start_date': leave.start_date,
-        #         'end_date': leave.end_date
-        #     }
-
-        #     # Append the formatted data to the list
-        #     leave_list.append(leave_data)
-
-        # # Return the formatted list as a response
-        # return Response(leave_list, status=status.HTTP_200_OK)
-
 
 class AppliedLeaveView(APIView):
     def post(self, request, format=None):
@@ -109,7 +82,8 @@ class LoginView(APIView):
                 'student_id': student.id,
                 'student_name': student.name,
                 'start_date': leave.start_date,
-                'end_date': leave.end_date
+                'end_date': leave.end_date,
+                'status':0
             }
 
             # Append the formatted data to the list
