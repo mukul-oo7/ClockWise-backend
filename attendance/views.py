@@ -3,13 +3,54 @@ from datetime import date
 from account.models import Student
 from .models import Attendance
 from rest_framework.views import APIView
-from account.models import Student, Faculty, CourseRegistration
+from account.models import Student, CourseRegistration
 from django.http import JsonResponse
 from rest_framework.response import Response
 from datetime import date, datetime
 
 from rest_framework.decorators import api_view
 from django.db.models import Q
+
+from django.views.decorators.csrf import csrf_exempt
+
+# @csrf_exempt
+class FacialAttendance(APIView):
+    def post(self, request):
+        try:
+            # Extract data from the request
+            print(request.data)
+            student_id = request.data['student_id']
+            course_name = request.data['course_name']
+            
+            # Get the current date
+            current_date = date.today()
+            
+            # Retrieve the student object
+            student = Student.objects.get(id=student_id)
+            
+            # Create or update attendance record
+            attendance, created = Attendance.objects.get_or_create(
+                date=current_date,
+                student=student,
+                course_name=course_name,
+                defaults={'status': 1}  # Mark the student present by default
+            )
+            
+            # Check if the attendance record was created or updated
+            if created:
+                message = f"Attendance marked for {student.name} in {course_name} on {current_date}"
+            else:
+                message = f"Attendance updated for {student.name} in {course_name} on {current_date}"
+                
+            return JsonResponse({'message': message}, status=201)
+        
+        except KeyError:
+            return JsonResponse({'error': 'Invalid request data'}, status=400)
+        except Student.DoesNotExist:
+            return JsonResponse({'error': 'Student not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
 
 
 # @api_view(['POST'])
