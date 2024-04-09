@@ -18,7 +18,6 @@ class FacialAttendance(APIView):
     def post(self, request):
         try:
             # Extract data from the request
-            print(request.data)
             student_id = request.data['student_id']
             course_name = request.data['course_name']
             
@@ -28,19 +27,16 @@ class FacialAttendance(APIView):
             # Retrieve the student object
             student = Student.objects.get(id=student_id)
             
-            # Create or update attendance record
-            attendance, created = Attendance.objects.get_or_create(
+            # Create attendance record
+            attendance = Attendance.objects.create(
                 date=current_date,
                 student=student,
                 course_name=course_name,
-                defaults={'status': 1}  # Mark the student present by default
+                status=1  # Mark the student present
             )
             
-            # Check if the attendance record was created or updated
-            if created:
-                message = f"Attendance marked for {student.name} in {course_name} on {current_date}"
-            else:
-                message = f"Attendance updated for {student.name} in {course_name} on {current_date}"
+            # Construct success message
+            message = f"Attendance marked for {student.name} in {course_name} on {current_date}"
                 
             return JsonResponse({'message': message}, status=201)
         
@@ -50,6 +46,7 @@ class FacialAttendance(APIView):
             return JsonResponse({'error': 'Student not found'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
     
 
 
