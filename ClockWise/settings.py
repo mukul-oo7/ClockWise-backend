@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'account',
     'attendance',
+    'administration'
 ]
 
 CORS_ALLOWED_ORIGINS = [
